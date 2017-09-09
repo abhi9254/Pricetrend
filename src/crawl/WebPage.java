@@ -2,6 +2,8 @@ package crawl;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -18,6 +20,7 @@ public class WebPage {
 	private String webPageHash;
 	private int anchorParseStatus;
 	private int emailParseStatus;
+	private int CRAWL_DEPTH = 1;
 
 	private Document document;
 
@@ -53,53 +56,63 @@ public class WebPage {
 
 	public void loadDocumentFromWeb(String website) throws Exception {
 
+		int page = 1;
+
 		SQL ob = new SQL();
-
+		BlockingQueue<String> nextPages = new ArrayBlockingQueue<>(5);
 		try {
-			document = Jsoup.connect(anchor.getAnchorUrl()).get();
+			String web_url = anchor.getAnchorUrl();
+			document = Jsoup.connect(web_url).get();
 			Elements details = document.select("a");
+
 			if ("amazon".equals(website)) {
-				for (Element detail : details) {
-					// Print all urls
-					// System.out.println(detail.attr("abs:href").toString());
-					String url = detail.attr("abs:href").toString();
+				do {
+					if (page != 1) {
+						System.out.println("Page : " + page);
+						details = Jsoup.connect(nextPages.take()).get().select("a");
+					}
+					for (Element detail : details) {
+						String url = detail.attr("abs:href").toString();
 
-					if (url.contains("/dp/")) {
-						// System.out.println(url.substring(0,
-						// url.indexOf("/dp/")+14));
+						if (url.contains("/dp/")) {
+							ob.insertIntoCrawledData(anchor.getDomain().getDomainUrl(), anchor.getAnchorUrl(),
+									Common.getTimestamp(), url.substring(0, url.indexOf("/dp/") + 14), null,
+									Hasher.toSHA256(url.substring(0, url.indexOf("/dp/") + 14)));
 
-						ob.insertIntoCrawledData(anchor.getDomain().getDomainUrl(), anchor.getAnchorUrl(),
-								Common.getTimestamp(), url.substring(0, url.indexOf("/dp/") + 14), null,
-								Hasher.toSHA256(url.substring(0, url.indexOf("/dp/") + 14)));
-
-						/*
-						 * Products prds = new Products(); Product prd = new
-						 * Product(url);
-						 * 
-						 * if (!prds.checkProductExists(prd)) { Linker lin = new
-						 * Linker(prd.getP_url()); int p_id = lin.findLinkage();
-						 * if (p_id != 0) prd.updateUrlForProduct(p_id,
-						 * prd.getP_url()); else { prds.insertIntoProducts(prd);
-						 * }
-						 */ } // else {
-					// System.out.println(url);
-					// insert non-product url
-					// }
-
-				}
+						} else if (detail.hasClass("pagnNext")) {
+							if (!nextPages.contains(url)) {
+								nextPages.offer(url);
+								// System.out.println(url);
+							}
+						}
+					}
+					page++;
+				} while (!nextPages.isEmpty() && page <= CRAWL_DEPTH);
 			}
 
 			else if ("flipkart".equals(website)) {
-				for (Element detail : details) {
-					String url = detail.attr("abs:href").toString();
-					if (url.contains("/p/")) {
-						//System.out.println(url.substring(0, url.indexOf("/p/") + 19));
-
-						ob.insertIntoCrawledData(anchor.getDomain().getDomainUrl(), anchor.getAnchorUrl(),
-								Common.getTimestamp(), url.substring(0, url.indexOf("/p/") + 19), null,
-								Hasher.toSHA256(url.substring(0, url.indexOf("/p/") + 19)));
+				do {
+					if (page != 1) {
+						System.out.println("Page : " + page);
+						details = Jsoup.connect(nextPages.take()).get().select("a");
 					}
-				}
+					for (Element detail : details) {
+						String url = detail.attr("abs:href").toString();
+						if (url.contains("/p/")) {
+							ob.insertIntoCrawledData(anchor.getDomain().getDomainUrl(), anchor.getAnchorUrl(),
+									Common.getTimestamp(), url.substring(0, url.indexOf("/p/") + 19), null,
+									Hasher.toSHA256(url.substring(0, url.indexOf("/p/") + 19)));
+
+						} else if (detail.hasClass("_33m_Yg") && url.contains("?page=" + (page + 1) + "&")) {
+							if (!nextPages.contains(url)) {
+								nextPages.offer(url);
+								// System.out.println(url);
+							}
+						}
+					}
+
+					page++;
+				} while (!nextPages.isEmpty() && page <= CRAWL_DEPTH);
 			}
 		}
 

@@ -10,12 +10,13 @@ public class CrawlDriver {
 
 	public CrawlDriver() {
 		// Earphones category
-		// amazon_categories.add("/b/ref=sv_sv_ce_0_1?node=1388921031");
+		amazon_categories.add("/b/ref=sv_sv_ce_0_1?node=1388921031");
 		// Hard disk category
 		// amazon_categories.add("/b/ref=s9_acss_bw_en_CEPCEN_d_1_4_w?node=1375395031");
-		//flipkart_categories.add("/mobiles");
-		flipkart_categories.add("/headphones-store");
-
+		// flipkart_categories.add("/mobiles");
+		// flipkart_categories.add("/headphones-store");
+		flipkart_categories.add("/audio-video/headphones/pr?sid=0pm,fcn");
+		// flipkart_categories.add("/computers/storage/external-hard-disks/pr?sid=6bo,jdy,nl6");
 	}
 
 	public void startCrawl() throws Exception {

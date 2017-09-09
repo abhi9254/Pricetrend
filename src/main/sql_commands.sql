@@ -35,7 +35,7 @@ insert into products_links values(3,'paytmmall',50000,'https://paytmmall.com/f-d
 drop table if exists pricetrend.all_products;
 create table if not exists all_products(
  p_id            INT NOT NULL AUTO_INCREMENT,         
- p_name          VARCHAR(200),
+ p_name          VARCHAR(400),
  p_desc          VARCHAR(500),
  p_section       VARCHAR(200),
  p_category      VARCHAR(200),
@@ -54,6 +54,12 @@ insert into all_products values (2,'samsung 850 pro ssd','samsung','electronics'
 insert into all_products values (3,'f&d f550x speakers','fnd audio','electronics','speakers','bluetooth speakers','2.1 surround',null,null,null,null); 
 
 
+drop table if exists pricetrend.product_specs;
+create table if not exists pricetrend.product_specs(
+ p_id                INT NOT NULL PRIMARY KEY,         
+ p_specs             JSON,
+ updated_timestamp   TIMESTAMP
+);
 
 drop table if exists pricetrend.crawled_data;
 create table if not exists crawled_data(

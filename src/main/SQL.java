@@ -90,10 +90,27 @@ public class SQL {
 		try {
 			connection = dataSource.getConnection();
 			statement = connection.createStatement();
-
 			String query = "INSERT INTO pricetrend.products_links (p_id,p_website,p_price,p_url,hashed_p_url,updated_timestamp) VALUES("
 					+ p_id + ",'" + p_website + "'," + p_price + ",'" + p_url + "','" + p_hashed_url + "','"
 					+ updated_timestamp + "')";
+			// System.out.println(query);
+			statement.executeUpdate(query);
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			returnCode = false;
+		}
+		return returnCode;
+	}
+
+	public boolean insertIntoProductSpecs(Integer p_id, String p_specs, Timestamp updated_timestamp) {
+
+		boolean returnCode = true;
+		try {
+			connection = dataSource.getConnection();
+			statement = connection.createStatement();
+			String query = "INSERT INTO pricetrend.product_specs (p_id,p_specs,updated_timestamp) VALUES(" + p_id
+					+ ",JSON_OBJECT(" + p_specs + "),'" + updated_timestamp + "')";
 			// System.out.println(query);
 			statement.executeUpdate(query);
 			connection.close();
