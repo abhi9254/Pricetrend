@@ -4,7 +4,7 @@
 <%@ page import="java.sql.*"%>
 <%@ page import="java.io.*"%>
 <%@ page
-	import="main.Crawler,main.SQL,main.PriceUpdater,main.User,main.Products,main.Linker,crawl.CrawlDriver"%>
+	import="crawl.Crawler,main.SQL,main.PriceUpdater,main.User,main.Products,main.Linker,crawl.CrawlDriver,crawl.ProductDetailsFetcher"%>
 <%
 	PrintWriter outRes = response.getWriter();
 
@@ -41,17 +41,27 @@
 		outRes.print("Scraping finished");
 	}
 
+	if ("start".equals(request.getParameter("prd_dtls_fetcher"))) {
+
+		ProductDetailsFetcher ob = new ProductDetailsFetcher();
+		ob.updateProductsData();
+		outRes.print("Fetching product details finished");
+	}
+
 	if ("start".equals(request.getParameter("linker"))) {
 
 		Linker ob = new Linker();
-		ob.updateProductsData();
-		outRes.print("Linking finished");
+		if (ob.denormalizeProductData()) {
+			ob.linkMatchingProducts();
+			outRes.print("Product linking finished");
+		} else
+			outRes.print("An error has occured");
 	}
 
 	if ("1".equals(request.getParameter("wishlist")) && request.getParameter("user") != null) {
 
 		User ob = new User(Integer.parseInt(request.getParameter("user")));
-		ArrayList<Integer> user_prods = ob.getMyproducts();
+		ArrayList<Long> user_prods = ob.getMyproducts();
 		Products prds = new Products(user_prods);
 		ArrayList<String> user_p_names = prds.getP_names();
 		StringBuilder s = new StringBuilder();

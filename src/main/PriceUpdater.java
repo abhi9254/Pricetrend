@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import crawl.Crawler;
+
 public class PriceUpdater {
 
 	public PriceUpdater() {
@@ -19,11 +21,11 @@ public class PriceUpdater {
 		ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(4);
 		System.out.println("Current time " + LocalDateTime.now().getHour() + " hr");
 
-		ArrayList<Integer> p_list = new ArrayList<Integer>();
+		ArrayList<Long> p_list = new ArrayList<Long>();
 		Products prds = new Products();
 
 		p_list = prds.getAllProducts();
-		for (int p_id : p_list) {
+		for (long p_id : p_list) {
 
 			// check time of day
 			if (LocalDateTime.now().getHour() > 5 && LocalDateTime.now().getHour() < 8) {
@@ -47,11 +49,11 @@ public class PriceUpdater {
 
 class PriceUpdaterService implements Runnable {
 
-	private int p_id;
+	private long p_id;
 	private URL p_url;
 
-	PriceUpdaterService(int p_id, URL p_url) {
-		this.p_id = p_id;
+	PriceUpdaterService(long p_id2, URL p_url) {
+		this.p_id = p_id2;
 		this.p_url = p_url;
 	}
 
@@ -60,11 +62,11 @@ class PriceUpdaterService implements Runnable {
 		updateProductPrice(p_id, p_url);
 	}
 
-	private void updateProductPrice(int p_id, URL p_url) {
+	private void updateProductPrice(long p_id2, URL p_url) {
 		try {
 			Crawler crw = new Crawler();
 			Float p_price = crw.getPriceFromURL(p_url);
-			System.out.println(LocalDateTime.now() + " Updated p_id " + p_id + " : " + p_price);
+			System.out.println(LocalDateTime.now() + " Updated p_id " + p_id2 + " : " + p_price);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

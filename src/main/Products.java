@@ -1,12 +1,11 @@
 package main;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+
 import java.util.ArrayList;
 
 public class Products {
 
-	private ArrayList<Integer> p_list;
+	private ArrayList<Long> p_list;
 	private ArrayList<String> p_names;
 	private ArrayList<Float> p_best_prices;
 
@@ -14,11 +13,11 @@ public class Products {
 
 	}
 
-	public Products(ArrayList<Integer> p_list) {
+	public Products(ArrayList<Long> p_list) {
 		this.p_list = p_list;
 		SQL sql = new SQL();
 		this.p_names = sql.getProductNames(p_list);
-	//	this.p_best_prices = sql.getBestPrices(p_list);
+		// this.p_best_prices = sql.getBestPrices(p_list);
 	}
 
 	public ArrayList<String> getP_names() {
@@ -29,9 +28,9 @@ public class Products {
 		return p_best_prices;
 	}
 
-	public ArrayList<Integer> getAllProducts() {
+	public ArrayList<Long> getAllProducts() {
 		SQL sql = new SQL();
-		p_list = new ArrayList<Integer>(sql.getListOfProducts());
+		p_list = new ArrayList<Long>(sql.getListOfProducts());
 		return p_list;
 	}
 
@@ -40,10 +39,10 @@ public class Products {
 		return sql.checkUrlExists(prd.getHashed_p_url());
 	}
 
-	public int insertIntoProducts(Product prd) {
+	public int insertIntoCrawledProducts(Product prd) {
 		SQL sql = new SQL();
-		sql.insertIntoAllProducts(prd.getP_name(), prd.getP_desc(), prd.getP_section(), prd.getP_category(),
-				prd.getP_sub_category());
+		sql.insertIntoCrawledProducts(prd.getP_name(), prd.getP_desc(), prd.getP_section(), prd.getP_category(),
+				prd.getP_sub_category(), prd.getP_type(), prd.getP_sub_type(),prd.getP_specs(), prd.getCrawl_timestamp());
 
 		return sql.getMaxPid();
 	}

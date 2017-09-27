@@ -74,15 +74,28 @@
 			}
 		}
 	}
+
+	function start_prd_dtls_fetcher() {
+		document.getElementById("added_message").innerHTML = "Started Product details fetcher";
+		var z = new XMLHttpRequest();
+		z.open("GET", "ajax.jsp?prd_dtls_fetcher=start", true);
+		z.send(null);
+
+		z.onreadystatechange = function() {
+			if (z.readyState == 4) {
+				document.getElementById("added_message").innerHTML = z.responseText;
+			}
+		}
+	}
 </script>
 </head>
 <body>
 
-	<li><a href="">Home</a> <a href="wishlist.jsp">Wishlist</a> <a
-		href="profile.jsp">Account</a></li>
-	<li><a onclick="start_updater()">Update</a></li>
-	<li><a onclick="start_crawler()">Crawl</a></li>
-	<li><a onclick="start_linker()">Link</a></li>
+	<li><a href="">Home</a> | <a href="wishlist.jsp">Wishlist</a> | <a
+		href="profile.jsp">Account</a> | <a href="products.jsp">Products</a> |
+		<a onclick="start_updater()">Update</a> | <a onclick="start_crawler()">Crawl</a>
+		| <a onclick="start_prd_dtls_fetcher()">Fetch_prd_dtls</a> | <a
+		onclick="start_linker()">Link</a></li>
 	<br>
 
 	<div>

@@ -1,15 +1,24 @@
-package main;
+package crawl;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 public class Crawler {
+	private boolean ALT_SKU_CRAWL = true;
 
 	public Float getPriceFromURL(URL url) {
 		// System.out.println(url.getHost());
@@ -150,7 +159,8 @@ public class Crawler {
 			for (int i = 0; i < specs_box.size(); i++) {
 				Elements specs = specs_box.get(i).select("div.vmXPri,ul._3dG3ix > li");
 				for (int j = 0; j < specs.size(); j = j + 2) {
-					//System.out.println(specs.get(j).ownText() + " : " + specs.get(j + 1).ownText());
+					// System.out.println(specs.get(j).ownText() + " : " +
+					// specs.get(j + 1).ownText());
 					prd_dtls.put(specs.get(j).ownText(), specs.get(j + 1).ownText());
 				}
 			}
@@ -163,6 +173,68 @@ public class Crawler {
 			prd_dtls.put("product_avl", product_avl);
 			prd_dtls.put("product_price", product_price.toString());
 
+		}
+		if ("paytmmall.com".equals(url.getHost())) {
+			URL ajaxurl = new URL(
+					"https://catalog.paytm.com/v1/p/" + url.toString().substring(22, url.toString().length() - 4));
+			// System.out.println("paytm " + ajaxUrl);
+
+			HttpURLConnection con = (HttpURLConnection) ajaxurl.openConnection();
+			con.setRequestMethod("GET");
+
+			BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String inputLine;
+			StringBuffer content = new StringBuffer();
+			while ((inputLine = br.readLine()) != null) {
+				content.append(inputLine);
+			}
+			br.close();
+
+			JSONObject jso = new JSONObject(content.toString());
+
+			String product_title = (jso.get("name").toString() != null ? jso.get("name").toString()
+					: jso.get("productName").toString());
+			String prd_price = (jso.get("offer_price").toString() != null ? jso.get("offer_price").toString()
+					: jso.get("actual_price").toString());
+
+			prd_dtls.put("product_title", product_title);
+			prd_dtls.put("product_desc", product_title);
+			prd_dtls.put("product_price", prd_price);
+
+			JSONArray jso_array = jso.getJSONArray("long_rich_desc");
+			JSONObject jso_child;
+
+			/*
+			 * for (Entry<String, Object> attr : jso_child.toMap().entrySet()) {
+			 * if (attr.getValue() != null) prd_dtls.put(attr.getKey(),
+			 * attr.getValue().toString()); // System.out.println(attr.getKey()
+			 * + // attr.getValue().toString());
+			 * 
+			 * }
+			 */
+
+			Iterator it = jso_array.iterator();
+			while (it.hasNext()) {
+				jso_child = (JSONObject) it.next();
+				jso_child = jso_child.getJSONObject("attributes");
+				for (Entry<String, Object> attr : jso_child.toMap().entrySet()) {
+					if (attr.getValue() != null)
+						prd_dtls.put(attr.getKey(), attr.getValue().toString());
+					// System.out.println(attr.getKey() +
+					// attr.getValue().toString());
+				}
+
+			}
+
+			jso_array = jso.getJSONArray("ancestors");
+			it = jso_array.iterator();
+			int hierarchy_lvl = 0;
+			while (it.hasNext() && hierarchy_lvl < 4) {
+				jso_child = (JSONObject) it.next();
+				prd_dtls.put("product_hierarchy_" + hierarchy_lvl++, jso_child.get("name").toString());
+				// System.out.println("product_hierarchy_" + hierarchy_lvl++ +
+				// jso_child.get("name").toString());
+			}
 		}
 
 		return prd_dtls;
@@ -179,7 +251,6 @@ public class Crawler {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return product_details.toString();
@@ -195,10 +266,7 @@ public class Crawler {
 				product_details.append(detail.ownText() + " ");
 			}
 
-			
-			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return product_details.toString();

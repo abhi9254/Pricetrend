@@ -8,7 +8,7 @@ public class User {
 	private int pincode;
 	private String email;
 	private int mobile;
-	private ArrayList<Integer> myproducts = new ArrayList<Integer>();
+	private ArrayList<Long> myproducts = new ArrayList<Long>();
 
 	public User(int u_id) {
 		this.u_id = u_id;
@@ -16,7 +16,7 @@ public class User {
 		this.myproducts=sql.getUserProducts(u_id);
 	}
 
-	public ArrayList<Integer> getMyproducts() {
+	public ArrayList<Long> getMyproducts() {
 		return myproducts;
 	}
 

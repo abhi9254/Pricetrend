@@ -2,21 +2,26 @@ package main;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import crawl.Hasher;
 
 public class Product {
 
-	private int p_id;
+	private long p_id;
 	private String p_name;
 	private String p_desc;
 	private String p_section;
 	private String p_category;
 	private String p_sub_category;
+	private String p_type;
+	private String p_sub_type;
+	private String p_specs;
 	private String p_url;
 	private String hashed_p_url;
 	private ArrayList<String> p_url_list;
+	private Timestamp crawl_timestamp;
 
 	public Product(int p_id, String p_name, String p_desc) {
 		this.p_id = p_id;
@@ -24,7 +29,8 @@ public class Product {
 		this.p_desc = p_desc;
 	}
 
-	public Product(String p_name, String p_desc, String p_section, String p_category, String p_sub_category) {
+	public Product(String p_name, String p_desc, String p_section, String p_category, String p_sub_category,
+			String p_type, String p_sub_type) {
 		this.p_name = p_name;
 		this.p_desc = p_desc;
 		this.p_section = p_section;
@@ -32,8 +38,8 @@ public class Product {
 		this.p_sub_category = p_sub_category;
 	}
 
-	public Product(int p_id) {
-		this.p_id = p_id;
+	public Product(long p_id2) {
+		this.p_id = p_id2;
 	}
 
 	public Product(String p_url) throws Exception {
@@ -45,7 +51,7 @@ public class Product {
 		return p_desc;
 	}
 
-	public int getP_id() {
+	public long getP_id() {
 		return p_id;
 	}
 
@@ -75,6 +81,30 @@ public class Product {
 
 	public String getP_sub_category() {
 		return p_sub_category;
+	}
+
+	public String getP_type() {
+		return p_type;
+	}
+
+	public String getP_sub_type() {
+		return p_sub_type;
+	}
+
+	public String getP_specs() {
+		return p_specs;
+	}
+
+	public Timestamp getCrawl_timestamp() {
+		return crawl_timestamp;
+	}
+
+	public void setCrawl_timestamp(Timestamp crawl_timestamp) {
+		this.crawl_timestamp = crawl_timestamp;
+	}
+
+	public void setP_specs(String p_specs) {
+		this.p_specs = p_specs;
 	}
 
 	public ArrayList<URL> getProductURLs() {
